@@ -81,7 +81,7 @@ def format_document(
     description="Summarizes the contents of the document."
 )
 def summarize_document(
-    doc_id: str = Field(description="Id of the document to format")
+    doc_id: str = Field(description="Id of the document to summarize")
 ) -> list[base.Message]:
     prompt = f"""
         Your goal is to summarize a document.
