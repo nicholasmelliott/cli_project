@@ -81,7 +81,7 @@ def format_document(
     description="Summarizes the contents of the document."
 )
 def summarize_document(
-    doc_id: str = Field(description="Id of the document to summarize")
+    doc_id: str = Field(description="Id of the document to format")
 ) -> list[base.Message]:
     prompt = f"""
         Your goal is to summarize a document.
@@ -90,6 +90,32 @@ def summarize_document(
         <document_id>
         {doc_id}
         </document_id>
+    """
+    return [ base.UserMessage(prompt) ]
+
+
+@mcp.prompt(
+    name="translate",
+    description="Translates the contents of the document into the specified language."
+)
+def translate_document(
+    doc_id: str = Field(description="Id of the document to translate"),
+    # target_language: str = Field(description="The language to translate the document into (e.g., 'French', 'Spanish', 'German')")
+) -> list[base.Message]:
+    prompt = f"""
+    Your goal is to translate a document into the specified language.
+
+    The id of the document you need to translate is:
+    <document_id>
+    {doc_id}
+    </document_id>
+
+    The target language is:
+    <target_language>
+    Spanish
+    </target_language>
+
+    Use the 'edit_document' tool to update the document with the translated content. Only translate the content, do not add commentary.
     """
     return [ base.UserMessage(prompt) ]
 
