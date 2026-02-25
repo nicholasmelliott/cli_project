@@ -49,6 +49,9 @@ class UnifiedCompleter(Completer):
     def update_resources(self, resources: List):
         self.resources = resources
 
+    def update_languages(self, languages: List):
+        self.languages = languages
+
     def get_completions(self, document, complete_event):
         text = document.text
         text_before_cursor = document.text_before_cursor
@@ -86,20 +89,40 @@ class UnifiedCompleter(Completer):
             if len(parts) == 1 and text.endswith(" "):
                 cmd = parts[0]
 
-                if cmd in self.prompt_dict:
+                if cmd == "translate":
                     for id in self.resources:
                         yield Completion(
                             id,
                             start_position=0,
                             display=id,
                         )
-                return
+                    return
+                elif cmd in self.prompt_dict:
+                    for id in self.resources:
+                        yield Completion(
+                            id,
+                            start_position=0,
+                            display=id,
+                        )
+                    return
+
+            if len(parts) == 2 and text.endswith(" "):
+                cmd = parts[0]
+                if cmd == "translate":
+                    for lang in getattr(self, "languages", []):
+                        yield Completion(
+                            lang,
+                            start_position=0,
+                            display=lang,
+                            display_meta="Language",
+                        )
+                    return
 
             if len(parts) >= 2:
                 doc_prefix = parts[-1]
 
                 for resource in self.resources:
-                    if "id" in resource and resource["id"].lower().startswith(
+                    if isinstance(resource, dict) and "id" in resource and resource["id"].lower().startswith(
                         doc_prefix.lower()
                     ):
                         yield Completion(
@@ -176,9 +199,18 @@ class CliApp:
             auto_suggest=self.command_autosuggester,
         )
 
+
     async def initialize(self):
         await self.refresh_resources()
+        await self.refresh_languages()
         await self.refresh_prompts()
+
+    async def refresh_languages(self):
+        try:
+            languages = await self.agent.list_languages()
+            self.completer.update_languages(languages)
+        except Exception as e:
+            print(f"Error refreshing languages: {e}")
 
     async def refresh_resources(self):
         try:

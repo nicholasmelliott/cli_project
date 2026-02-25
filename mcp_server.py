@@ -14,6 +14,10 @@ docs = {
     "spec.txt": "These specifications define the technical requirements for the equipment.",
 }
 
+SUPPORTED_LANGUAGES = [
+    "French", "Spanish", "German", "Italian", "Portuguese", "Chinese", "Japanese", "Korean", "Russian"
+]
+
 @mcp.tool(
     name="read_doc_contents",
     description="Read the contents of a document and return it as a string."
@@ -54,6 +58,13 @@ def fetch_doc(doc_id: str) -> str:
     if doc_id not in docs:
         raise ValueError(f"Doc with id {doc_id} not found")
     return docs[doc_id]
+
+mcp.resource(
+    "docs://languages",
+    mime_type="application/json"
+)
+def list_languages() -> list[str]:
+    return SUPPORTED_LANGUAGES
 
 @mcp.prompt(
     name="format",
@@ -100,7 +111,7 @@ def summarize_document(
 )
 def translate_document(
     doc_id: str = Field(description="Id of the document to translate"),
-    # target_language: str = Field(description="The language to translate the document into (e.g., 'French', 'Spanish', 'German')")
+    target_language: str = Field(description="The language to translate the document into (e.g., 'French', 'Spanish', 'German')")
 ) -> list[base.Message]:
     prompt = f"""
     Your goal is to translate a document into the specified language.
@@ -112,7 +123,7 @@ def translate_document(
 
     The target language is:
     <target_language>
-    Spanish
+    {target_language}
     </target_language>
 
     Use the 'edit_document' tool to update the document with the translated content. Only translate the content, do not add commentary.

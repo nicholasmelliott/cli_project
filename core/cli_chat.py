@@ -8,6 +8,8 @@ from mcp_client import MCPClient
 
 
 class CliChat(Chat):
+
+
     def __init__(
         self,
         doc_client: MCPClient,
@@ -15,8 +17,7 @@ class CliChat(Chat):
         claude_service: Claude,
     ):
         super().__init__(clients=clients, claude_service=claude_service)
-
-        self.doc_client: MCPClient = doc_client
+        self.doc_client = doc_client
 
     async def list_prompts(self) -> list[Prompt]:
         return await self.doc_client.list_prompts()
@@ -28,9 +29,12 @@ class CliChat(Chat):
         return await self.doc_client.read_resource(f"docs://documents/{doc_id}")
 
     async def get_prompt(
-        self, command: str, doc_id: str
+        self, command: str, doc_id: str, target_language: str = None
     ) -> list[PromptMessage]:
-        return await self.doc_client.get_prompt(command, {"doc_id": doc_id})
+        args = {"doc_id": doc_id}
+        if target_language:
+            args["target_language"] = target_language
+        return await self.doc_client.get_prompt(command, args)
 
     async def _extract_resources(self, query: str) -> str:
         mentions = [word[1:] for word in query.split() if word.startswith("@")]
@@ -55,12 +59,25 @@ class CliChat(Chat):
         words = query.split()
         command = words[0].replace("/", "")
 
-        messages = await self.doc_client.get_prompt(
-            command, {"doc_id": words[1]}
-        )
+        # Special handling for translate: expects /translate <doc_id> <target_language>
+        if command == "translate" and len(words) >= 3:
+            doc_id = words[1]
+            target_language = words[2]
+            messages = await self.get_prompt(command, doc_id, target_language)
+        elif command == "translate":
+            # Not enough args, skip
+            return False
+        elif len(words) >= 2:
+            doc_id = words[1]
+            messages = await self.get_prompt(command, doc_id)
+        else:
+            return False
 
         self.messages += convert_prompt_messages_to_message_params(messages)
         return True
+
+    async def list_languages(self) -> list[str]:
+        return await self.doc_client.read_resource("docs://languages")
 
     async def _process_query(self, query: str):
         if await self._process_command(query):
