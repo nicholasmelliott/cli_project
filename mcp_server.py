@@ -59,7 +59,7 @@ def fetch_doc(doc_id: str) -> str:
         raise ValueError(f"Doc with id {doc_id} not found")
     return docs[doc_id]
 
-mcp.resource(
+@mcp.resource(
     "docs://languages",
     mime_type="application/json"
 )
