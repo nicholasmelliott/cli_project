@@ -6,11 +6,11 @@ mcp = FastMCP("DocumentMCP", log_level="ERROR")
 
 
 docs = {
-    "deposition.md": "This deposition covers the testimony of Angela Smith, P.E.",
+    "deposition.md": "This deposition, taken by John Smith, covers the testimony of Angela Smith, P.E. Further depostions from the same parties are required by the 3rd of April.",
     "report.pdf": "The report details the state of a 20m condenser tower.",
     "financials.docx": "These financials outline the project's budget and expenditures.",
     "outlook.pdf": "This document presents the projected future performance of the system.",
-    "plan.md": "The plan outlines the steps for the project's implementation.",
+    "plan.md": "The plan outlines the steps for the project's implementation. Completion of the plan must occur by May, 15 2026.",
     "spec.txt": "These specifications define the technical requirements for the equipment.",
 }
 
@@ -130,5 +130,36 @@ def translate_document(
     """
     return [ base.UserMessage(prompt) ]
 
+@mcp.prompt(
+    name="extract_action_items",
+    description="Extracts actionable tasks, deadlines, and responsible parties from the document, returning a structured list for project management or follow-up."
+)
+def extract_action_items(
+    doc_id: str = Field(description="Id of the document to analyze for action items")
+) -> list[base.Message]:
+    prompt = f"""
+    Your goal is to extract all actionable tasks, deadlines, and responsible parties from the following document.
+
+    The id of the document is:
+    <document_id>
+    {doc_id}
+    </document_id>
+
+    For each action item, return:
+    - Task description
+    - Responsible party (if mentioned)
+    - Deadline or due date (if mentioned)
+
+    Return the results as a structured JSON list, e.g.:
+    [
+      { '{' }"task": "Review budget", "responsible": "Alex", "deadline": "2026-03-10"{ '}' },
+      ...
+    ]
+
+    If no action items are found, return an empty list.
+    """
+    return [ base.UserMessage(prompt) ]
+
+    
 if __name__ == "__main__":
     mcp.run(transport="stdio")
