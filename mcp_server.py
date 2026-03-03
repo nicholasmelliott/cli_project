@@ -177,9 +177,11 @@ def detect_risks(
     - Risk description
     - Severity (Low, Medium, High)
     - Suggested mitigation (if possible)
+    - Estimated time duration for mitigation (e.g., "2 weeks", "3 days", "1 month", "5 minutes")
+
     Return the results as a structured JSON list, e.g.:
     [
-      { '{' }"risk": "Project delay due to resource shortage", "severity": "High", "mitigation": "Hire additional staff"{ '}' },
+      { '{' }"risk": "Project delay due to resource shortage", "severity": "High", "mitigation": "Hire additional staff", "estimated_duration": "2 weeks"{ '}' },
       ...
     ]
     If no risks are found, return an empty list.
