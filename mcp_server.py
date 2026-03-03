@@ -160,6 +160,31 @@ def extract_action_items(
     """
     return [ base.UserMessage(prompt) ]
 
-    
+@mcp.prompt(
+    name="detect_risks",
+    description="Analyzes the document to identify and summarize potential risks, issues, or concerns, including their severity and suggested mitigations."
+)
+def detect_risks(
+    doc_id: str = Field(description="Id of the document to analyze for risks")
+) -> list[base.Message]:
+    prompt = f"""
+    Your goal is to analyze the following document and identify any potential risks, issues, or concerns.
+    The id of the document is:
+    <document_id>
+    {doc_id}
+    </document_id>
+    For each risk, return:
+    - Risk description
+    - Severity (Low, Medium, High)
+    - Suggested mitigation (if possible)
+    Return the results as a structured JSON list, e.g.:
+    [
+      { '{' }"risk": "Project delay due to resource shortage", "severity": "High", "mitigation": "Hire additional staff"{ '}' },
+      ...
+    ]
+    If no risks are found, return an empty list.
+    """
+    return [ base.UserMessage(prompt) ]
+
 if __name__ == "__main__":
     mcp.run(transport="stdio")
