@@ -188,5 +188,31 @@ def detect_risks(
     """
     return [ base.UserMessage(prompt) ]
 
+@mcp.prompt(
+    name="generate_questions",
+    description="Generates comprehension or review questions based on the document’s content. Useful for training, study guides, or knowledge checks."
+)
+def generate_questions(
+    doc_id: str = Field(description="Id of the document to generate questions from")
+) -> list[base.Message]:
+    prompt = f"""
+    Your goal is to generate comprehension or review questions based on the following document.
+
+    The id of the document is:
+    <document_id>
+    {doc_id}
+    </document_id>
+
+    Create 5-10 questions that test understanding of the document’s key points, facts, or concepts. Use a mix of question types (multiple choice, short answer, true/false, etc.) if possible. Return the questions as a structured JSON list, e.g.:
+    [
+      { '{' }"type": "multiple_choice", "question": "What is the deadline for project completion?", "choices": ["May 15, 2026", "June 1, 2026"], "answer": "May 15, 2026"{ '}' },
+      ...
+    ]
+
+    If no questions can be generated, return an empty list.
+    """
+    return [ base.UserMessage(prompt) ]
+
+    
 if __name__ == "__main__":
     mcp.run(transport="stdio")
