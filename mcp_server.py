@@ -213,6 +213,35 @@ def generate_questions(
     """
     return [ base.UserMessage(prompt) ]
 
-    
+@mcp.prompt(
+    name="find_inconsistencies",
+    description="Scans the document for conflicting statements, data discrepancies, or logical inconsistencies. Useful for quality assurance, technical reviews, or compliance."
+)
+def find_inconsistencies(
+    doc_id: str = Field(description="Id of the document to scan for inconsistencies")
+) -> list[base.Message]:
+    prompt = f"""
+    Your goal is to scan the following document for conflicting statements, data discrepancies, or logical inconsistencies.
+
+    The id of the document is:
+    <document_id>
+    {doc_id}
+    </document_id>
+
+    For each inconsistency found, return:
+    - Description of the inconsistency
+    - Location or section (if possible)
+    - Suggested correction or clarification (if possible)
+
+    Return the results as a structured JSON list, e.g.:
+    [
+      { '{' }"description": "Budget total does not match itemized costs", "location": "Section 2.1", "suggested_correction": "Update itemized costs to match total"{ '}' },
+      ...
+    ]
+
+    If no inconsistencies are found, return an empty list.
+    """
+    return [ base.UserMessage(prompt) ]
+
 if __name__ == "__main__":
     mcp.run(transport="stdio")
