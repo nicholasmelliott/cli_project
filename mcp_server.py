@@ -243,5 +243,35 @@ def find_inconsistencies(
     """
     return [ base.UserMessage(prompt) ]
 
+@mcp.prompt(
+    name="detect_dependencies",
+    description="Extracts and lists all dependencies, prerequisites, or required resources mentioned in the document. Useful for project planning, technical specs, or onboarding."
+)
+def detect_dependencies(
+    doc_id: str = Field(description="Id of the document to analyze for dependencies")
+) -> list[base.Message]:
+    prompt = f"""
+    Your goal is to extract and list all dependencies, prerequisites, or required resources mentioned in the following document.
+
+    The id of the document is:
+    <document_id>
+    {doc_id}
+    </document_id>
+
+    For each dependency, return:
+    - Dependency or resource name
+    - Type (e.g., software, hardware, personnel, external document, etc.)
+    - Description or notes (if available)
+
+    Return the results as a structured JSON list, e.g.:
+    [
+      { '{' }"name": "Python 3.10", "type": "software", "description": "Required for running scripts"{ '}' },
+      ...
+    ]
+
+    If no dependencies are found, return an empty list.
+    """
+    return [ base.UserMessage(prompt) ]
+
 if __name__ == "__main__":
     mcp.run(transport="stdio")
