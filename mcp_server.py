@@ -273,5 +273,38 @@ def detect_dependencies(
     """
     return [ base.UserMessage(prompt) ]
 
+@mcp.prompt(
+    name="detect_sentiment_zones",
+    description="Maps out sections of the document by sentiment (positive, negative, neutral), highlighting emotional tone shifts. Useful for reviews, reports, or communications."
+)
+def detect_sentiment_zones(
+    doc_id: str = Field(description="Id of the document to analyze for sentiment zones")
+) -> list[base.Message]:
+    prompt = f"""
+    Your goal is to analyze the following document and map out sections by sentiment: positive, negative, or neutral.
+
+    The id of the document is:
+    <document_id>
+    {doc_id}
+    </document_id>
+
+    For each section or paragraph, return:
+    - Section identifier or excerpt
+    - Sentiment (positive, negative, neutral)
+    - Brief explanation of why
+
+    Highlight any emotional tone shifts or transitions between sentiments throughout the document.
+
+    Return the results as a structured JSON list, e.g.:
+    [
+      { '{' }"section": "Introduction", "sentiment": "neutral", "explanation": "Objective overview"{ '}' },
+      { '{' }"section": "Budget Concerns", "sentiment": "negative", "explanation": "Expresses worry about overspending"{ '}' },
+      ...
+    ]
+
+    If no sentiment zones are found, return an empty list.
+    """
+    return [ base.UserMessage(prompt) ]
+
 if __name__ == "__main__":
     mcp.run(transport="stdio")
