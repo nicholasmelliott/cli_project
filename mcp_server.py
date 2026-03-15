@@ -299,5 +299,35 @@ def detect_sentiment_zones(
     """
     return [ base.UserMessage(prompt) ]
 
+@mcp.prompt(
+    name="generate_index",
+    description="Creates an index for the document, listing key topics, terms, or sections and their locations or page numbers. Useful for navigation and reference."
+)
+def generate_index(
+    doc_id: str = Field(description="Id of the document to generate an index for")
+) -> list[base.Message]:
+    prompt = f"""
+    Your goal is to create an index for the following document, similar to the back-of-book index.
+
+    The id of the document is:
+    <document_id>
+    {doc_id}
+    </document_id>
+
+    For each index entry, return:
+    - Topic, term, or section name
+    - Location or page/section number (if available)
+    - Brief context or description (optional)
+
+    Return the results as a structured JSON list, e.g.:
+    [
+      {{ "topic": "Budget", "location": "Section 2.1", "context": "Project financials" }},
+      ...
+    ]
+
+    If no index entries are found, return an empty list.
+    """
+    return [ base.UserMessage(prompt) ]
+
 if __name__ == "__main__":
     mcp.run(transport="stdio")
