@@ -319,10 +319,11 @@ def generate_index(
     - Location or page/section number (if available)
     - Brief context or description (optional)
     - Related topics or cross-references (if available)
+    - Supporting excerpt (1-2 lines from the source text)
 
     Return the results as a structured JSON list, e.g.:
     [
-            {{ "topic": "Budget", "location": "Section 2.1", "context": "Project financials", "related_topics": ["Forecast", "Expenses"] }},
+            {{ "topic": "Budget", "location": "Section 2.1", "context": "Project financials", "related_topics": ["Forecast", "Expenses"], "excerpt": "The project budget allocates 45% to staffing and 20% to infrastructure." }},
       ...
     ]
 
