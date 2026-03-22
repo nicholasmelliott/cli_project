@@ -331,5 +331,36 @@ def generate_index(
     """
     return [ base.UserMessage(prompt) ]
 
+@mcp.prompt(
+    name="generate_glossary",
+    description="Scans the document for technical terms, acronyms, and domain-specific language, then produces a structured glossary with definitions. Useful for onboarding, documentation, and knowledge sharing."
+)
+def generate_glossary(
+    doc_id: str = Field(description="Id of the document to generate a glossary for")
+) -> list[base.Message]:
+    prompt = f"""
+    Your goal is to scan the following document and produce a glossary of key terms, acronyms, and domain-specific language.
+
+    The id of the document is:
+    <document_id>
+    {doc_id}
+    </document_id>
+
+    For each glossary entry, return:
+    - Term or acronym
+    - Definition or expansion (as used in the document)
+    - Category (e.g., technical, business, legal, medical, acronym, etc.)
+    - Example sentence or context from the document (if available)
+
+    Return the results as a structured JSON list sorted alphabetically by term, e.g.:
+    [
+      {{"term": "API", "definition": "Application Programming Interface — a set of rules for how software components communicate", "category": "acronym", "example": "The API is used to connect the frontend to the backend services."}},
+      ...
+    ]
+
+    If no glossary-worthy terms are found, return an empty list.
+    """
+    return [ base.UserMessage(prompt) ]
+
 if __name__ == "__main__":
     mcp.run(transport="stdio")
