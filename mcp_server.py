@@ -362,5 +362,53 @@ def generate_glossary(
     """
     return [ base.UserMessage(prompt) ]
 
+@mcp.prompt(
+        name="generate_cheat_sheet",
+        description="Creates a practical cheat sheet from the document, including key concepts, commands, formulas, and quick-reference guidance. Useful for study, onboarding, and day-to-day execution."
+)
+def generate_cheat_sheet(
+        doc_id: str = Field(description="Id of the document to generate a cheat sheet for")
+) -> list[base.Message]:
+        prompt = f"""
+        Your goal is to create a concise, high-value cheat sheet from the following document.
+
+        The id of the document is:
+        <document_id>
+        {doc_id}
+        </document_id>
+
+        Build the cheat sheet for quick reference. Prioritize practical utility over exhaustive detail.
+
+        Include the following sections when the information exists:
+        - Core concepts (short definitions)
+        - Key steps or workflow (ordered)
+        - Commands, functions, or syntax snippets
+        - Rules, formulas, or thresholds
+        - Common mistakes and how to avoid them
+        - Quick checklist for execution/review
+
+        Return results as a structured JSON object, e.g.:
+        {{
+            "title": "Document Cheat Sheet",
+            "core_concepts": [
+                {{"term": "Rate Limit", "summary": "Maximum requests per time window"}}
+            ],
+            "workflow": ["Step 1", "Step 2"],
+            "commands_or_snippets": [
+                {{"label": "Start server", "snippet": "python main.py", "notes": "Run from project root"}}
+            ],
+            "rules_or_formulas": [
+                {{"name": "Retry backoff", "value": "delay = base * 2^attempt", "notes": "Cap at 30s"}}
+            ],
+            "common_mistakes": [
+                {{"mistake": "Missing environment variable", "avoidance": "Validate .env before running"}}
+            ],
+            "quick_checklist": ["Confirm prerequisites", "Run smoke test"]
+        }}
+
+        Keep entries brief and actionable. If a section has no relevant data, return an empty list for that section.
+        """
+        return [ base.UserMessage(prompt) ]
+
 if __name__ == "__main__":
     mcp.run(transport="stdio")
