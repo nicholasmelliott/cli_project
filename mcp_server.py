@@ -410,5 +410,35 @@ def generate_cheat_sheet(
         """
         return [ base.UserMessage(prompt) ]
 
+@mcp.prompt(
+    name="solve_common_problems",
+    description="Scans the document for common problems and returns practical, document-grounded solutions."
+)
+def solve_common_problems(
+    doc_id: str = Field(description="Id of the document to scan for common problems and solutions")
+) -> list[base.Message]:
+    prompt = f"""
+    Your goal is to scan the following document, identify common problems discussed or implied in it, and provide solutions grounded in the document context.
+
+    The id of the document is:
+    <document_id>
+    {doc_id}
+    </document_id>
+
+    Instructions:
+    - Focus only on problems that are supported by the document content.
+    - For each problem, propose a practical solution that aligns with the document's terminology and constraints.
+    - Do not invent external facts. If evidence is weak, mark confidence as "low".
+
+    Return the results as a structured JSON list, e.g.:
+    [
+      {{"problem": "Configuration errors when starting the service", "solution": "Validate required environment variables before launch", "evidence": "Section 'Setup' requires API key in .env", "confidence": "high"}},
+      ...
+    ]
+
+    If no common problems can be identified, return an empty list.
+    """
+    return [ base.UserMessage(prompt) ]
+
 if __name__ == "__main__":
     mcp.run(transport="stdio")
