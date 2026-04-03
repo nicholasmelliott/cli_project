@@ -429,10 +429,11 @@ def solve_common_problems(
     - Focus only on problems that are supported by the document content.
     - For each problem, propose a practical solution that aligns with the document's terminology and constraints.
     - Do not invent external facts. If evidence is weak, mark confidence as "low".
+    - Distinguish explicit vs. implied — note whether the problem is directly stated in the document ("explicit") or only implied from context ("implied"), and include this as a "source_type" field in each entry.
 
     Return the results as a structured JSON list, e.g.:
     [
-      {{"problem": "Configuration errors when starting the service", "solution": "Validate required environment variables before launch", "evidence": "Section 'Setup' requires API key in .env", "confidence": "high"}},
+      {{"problem": "Configuration errors when starting the service", "solution": "Validate required environment variables before launch", "evidence": "Section 'Setup' requires API key in .env", "confidence": "high", "source_type": "explicit"}},
       ...
     ]
 
