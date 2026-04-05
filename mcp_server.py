@@ -285,13 +285,14 @@ def detect_sentiment_zones(
     - Section identifier or excerpt
     - Sentiment (positive, negative, neutral)
     - Brief explanation of why
+    - Tone shift from the previous section (e.g., "more positive", "more negative", "no significant shift", or "N/A" for the first section)
 
     Highlight any emotional tone shifts or transitions between sentiments throughout the document.
 
     Return the results as a structured JSON list, e.g.:
     [
-      { '{' }"section": "Introduction", "sentiment": "neutral", "explanation": "Objective overview"{ '}' },
-      { '{' }"section": "Budget Concerns", "sentiment": "negative", "explanation": "Expresses worry about overspending"{ '}' },
+            { '{' }"section": "Introduction", "sentiment": "neutral", "explanation": "Objective overview", "tone_shift": "N/A"{ '}' },
+            { '{' }"section": "Budget Concerns", "sentiment": "negative", "explanation": "Expresses worry about overspending", "tone_shift": "more negative"{ '}' },
       ...
     ]
 
