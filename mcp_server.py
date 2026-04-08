@@ -442,5 +442,56 @@ def solve_common_problems(
     """
     return [ base.UserMessage(prompt) ]
 
+@mcp.prompt(
+        name="draft_next_steps_email",
+        description="Drafts a follow-up email from the document, summarizing outcomes, next steps, owners, and open questions. Useful after meetings, reviews, or project updates."
+)
+def draft_next_steps_email(
+        doc_id: str = Field(description="Id of the document to turn into a follow-up email"),
+        audience: str = Field(description="Target audience for the email, such as 'project team', 'executives', or 'client'")
+) -> list[base.Message]:
+        prompt = f"""
+        Your goal is to draft a concise, professional follow-up email based on the following document.
+
+        The id of the document is:
+        <document_id>
+        {doc_id}
+        </document_id>
+
+        The target audience is:
+        <audience>
+        {audience}
+        </audience>
+
+        Build the email so it is immediately usable. Base it only on information supported by the document.
+
+        Include:
+        - A clear subject line
+        - A brief summary of the main outcomes or takeaways
+        - Key decisions or updates, if present
+        - Next steps with owners and dates, if present
+        - Open questions, blockers, or risks that need follow-up, if present
+
+        Return the result as a structured JSON object, e.g.:
+        {{
+            "subject": "Follow-up: API rollout planning meeting",
+            "opening": "Thanks everyone for the discussion today. Here is a summary of the key outcomes and follow-up items.",
+            "summary": [
+                "The team agreed to delay partner onboarding until phase 2.",
+                "The testing checklist will be finalized this week."
+            ],
+            "next_steps": [
+                {{"task": "Finalize test plan", "owner": "Jordan", "due": "2026-04-12"}}
+            ],
+            "open_questions": [
+                "Whether the client needs weekly status reports during rollout"
+            ],
+            "closing": "Please reply with any corrections or additions."
+        }}
+
+        If a section has no supporting information in the document, return an empty list for that section. Keep the tone appropriate for the target audience.
+        """
+        return [ base.UserMessage(prompt) ]
+
 if __name__ == "__main__":
     mcp.run(transport="stdio")
